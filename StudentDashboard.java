@@ -1,8 +1,11 @@
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
 
 public class StudentDashboard {
+    // Color scheme
     private static final Color PRIMARY_COLOR = new Color(0, 51, 102);
     private static final Color SIDEBAR_COLOR = new Color(240, 245, 250);
     private static final Color ACTIVE_MENU_COLOR = new Color(200, 230, 255);
@@ -31,7 +34,7 @@ public class StudentDashboard {
         frame.add(mainContentPanel, BorderLayout.CENTER);
 
         // Menu Buttons and Content Panels
-        String[] menuItems = {"Dashboard", "Profile"};
+        String[] menuItems = {"Dashboard", "Notifications", "Enrollment", "Prospectus", "Study Load", "Grades", "Profile"};
         for (String item : menuItems) {
             JButton menuButton = createMenuButton(item);
             JPanel contentPanel = createContentPanel(item, username);
@@ -43,6 +46,10 @@ public class StudentDashboard {
             });
             sidebarPanel.add(menuButton);
         }
+
+        // Logout Button
+        JPanel footerPanel = createFooterPanel(frame);
+        frame.add(footerPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
     }
@@ -120,65 +127,24 @@ public class StudentDashboard {
     }
 
     private static JPanel createProfilePanel(String username) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
-
-        // Profile Header
-        JLabel profileHeader = new JLabel("Profile Details", JLabel.LEFT);
-        profileHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        profileHeader.setOpaque(true);
-        profileHeader.setBackground(new Color(68, 114, 196)); // Blue
-        profileHeader.setForeground(Color.WHITE);
-        profileHeader.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(profileHeader, BorderLayout.NORTH);
-
-        // Profile Content
-        JPanel contentPanel = new JPanel(new GridBagLayout());
-        contentPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        contentPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Mock Profile Data
-        String[][] profileData = {
-                {"First Name:", "Francis Adrian"},
-                {"Middle Name:", "Quiemet"},
-                {"Last Name:", "Semira"},
-                {"Name Suffix:", "None"},
-                {"Year Level:", "2"},
-                {"Classification:", "New Student"},
-                {"College:", "College of Computer Studies"},
-                {"Course:", "BSIT"},
-                {"Student ID:", "24233342"},
-                {"Verified Email:", "semirafrancis1@gmail.com"},
-                {"Mobile #:", "09512398828"},
-                {"Landline #:", ""},
-                {"Facebook:", "Francis Semirss"},
-                {"Birthdate:", "6/7/2005"},
-                {"Gender:", "Male"}
-        };
+        // Mock student data
+        HashMap<String, String> studentData = new HashMap<>();
+        studentData.put("Full Name", "Demo Student");
+        studentData.put("Email", "demo.student@example.com");
+        studentData.put("Year Level", "2nd Year");
+        studentData.put("Username", username);
 
+        // Add profile fields
         int row = 0;
-        for (String[] data : profileData) {
-            addProfileField(contentPanel, gbc, data[0], data[1], row++);
+        for (String key : studentData.keySet()) {
+            addProfileField(panel, gbc, key + ":", studentData.get(key), row++);
         }
-
-        panel.add(contentPanel, BorderLayout.CENTER);
-
-        // Buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setBackground(Color.WHITE);
-        JButton changePasswordButton = new JButton("Change Password");
-        JButton changeEmailButton = new JButton("Change Email");
-
-        styleButton(changePasswordButton);
-        styleButton(changeEmailButton);
-
-        buttonPanel.add(changePasswordButton);
-        buttonPanel.add(changeEmailButton);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
     }
@@ -192,13 +158,26 @@ public class StudentDashboard {
         panel.add(new JLabel(value), gbc);
     }
 
-    private static void styleButton(JButton button) {
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        button.setBackground(new Color(68, 114, 196));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    private static JPanel createFooterPanel(JFrame frame) {
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        footerPanel.setBackground(Color.WHITE);
+        footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        logoutButton.setBackground(new Color(255, 69, 0));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setFocusPainted(false);
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.setPreferredSize(new Dimension(100, 40));
+
+        logoutButton.addActionListener(e -> {
+            frame.dispose(); // Close the current dashboard
+            JOptionPane.showMessageDialog(null, "Logged out successfully.", "Logout", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        footerPanel.add(logoutButton);
+        return footerPanel;
     }
 
     private static void setActiveMenuButton(JPanel sidebarPanel, JButton activeButton) {
